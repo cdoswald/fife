@@ -176,7 +176,7 @@ class GradientBoostedTreesModeler(survival_modeler.SurvivalModeler):
 
     def build_model(
         self, n_intervals: Union[None, int] = None, params: dict = None,
-        train_in_parallel: bool = True
+        parallelize: bool = True
     ) -> None:
         """Train and store a sequence of gradient-boosted tree models."""
         if n_intervals:
@@ -189,7 +189,7 @@ class GradientBoostedTreesModeler(survival_modeler.SurvivalModeler):
         self.model = self.train(
             params=params,
             validation_early_stopping=early_stopping,
-            train_in_parallel=train_in_parallel,
+            parallelize=parallelize,
         )
 
     def train(
@@ -197,11 +197,11 @@ class GradientBoostedTreesModeler(survival_modeler.SurvivalModeler):
         params: Union[None, dict] = None,
         subset: Union[None, pd.core.series.Series] = None,
         validation_early_stopping: bool = True,
-        train_in_parallel: bool = True,
+        parallelize: bool = True,
     ) -> List[lgb.basic.Booster]:
         """Train a LightGBM model for each lead length."""
         models = []
-        if train_in_parallel:
+        if parallelize:
             for time_horizon in range(self.n_intervals):
                 model = dask.delayed(self.train_single_model)(
                     time_horizon=time_horizon,
